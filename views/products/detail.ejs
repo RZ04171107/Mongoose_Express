@@ -14,5 +14,9 @@
 
     <a href="/products"> Back to index page.</a>
     <a href="/products/<%=product._id%>/edit"> Edit the product</a>
+
+    <form action="/products/<%=product._id %>?_method=DELETE" method="POST">
+      <button type="submit">Delete Product</button>
+    </form>
   </body>
 </html>
