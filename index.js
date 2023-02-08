@@ -3,6 +3,7 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
 
 require('dotenv').config();
 const { MONGO_URL } = process.env;
@@ -14,6 +15,8 @@ const Product = require('./models/product');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+// override with POST having ?_method=DELETE
+app.use(methodOverride('_method'));
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -56,6 +59,21 @@ app.get('/products/:_id', async (req, res) => {
   const product = await Product.findById(_id);
   console.log(product);
   res.render('products/detail', { product: product });
+});
+
+app.get('/products/:_id/edit', async (req, res) => {
+  const { _id } = req.params;
+  const product = await Product.findById(_id);
+  res.render('products/edit', { product: product });
+});
+
+app.put('/products/:_id', async (req, res) => {
+  const { _id } = req.params;
+  const product = await Product.findByIdAndUpdate(_id, req.body, {
+    runValidators: true,
+    new: true,
+  });
+  res.redirect(`/products/${product._id}`);
 });
 
 app.listen(3000, () => {
